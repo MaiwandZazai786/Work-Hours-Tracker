@@ -15,6 +15,7 @@
         },
       };
     </script>
+
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
       rel="stylesheet"
@@ -65,32 +66,21 @@
       }
     </style>
   </head>
+
   <body
     class="min-h-screen bg-gradient-to-br from-slate-50 to-white dark:from-gray-900 dark:to-gray-800 transition-colors"
   >
     <div class="max-w-6xl mx-auto p-6">
       <header class="flex items-center justify-between gap-4 mb-6">
-        <div class="flex items-center gap-4">
-          <div
-            class="w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br from-indigo-600 to-pink-500 text-white text-lg font-bold shadow"
+        <div>
+          <h1
+            id="appTitle"
+            class="text-2xl font-extrabold text-gray-900 dark:text-white"
           >
-            WH
-          </div>
-          <div>
-            <h1
-              id="appTitle"
-              class="text-2xl font-extrabold text-gray-900 dark:text-white"
-            >
-              Work Hours Tracker
-            </h1>
-            <p
-              id="appSubtitle"
-              class="text-sm text-gray-600 dark:text-gray-300"
-            >
-              A modern monthly working-hours calculator
-            </p>
-          </div>
+            Work Hours Tracker
+          </h1>
         </div>
+
         <div class="flex items-center gap-2">
           <button
             id="langToggle"
@@ -140,6 +130,7 @@
           id="daysSection"
           class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
         ></section>
+
         <div class="mt-6">
           <button
             id="calculateBtn"
@@ -148,6 +139,7 @@
             Calculate total hours
           </button>
         </div>
+
         <div id="resultCard" class="hidden mt-6 p-4 rounded-lg glass shadow">
           <div class="flex items-start justify-between mb-2">
             <h2
@@ -166,6 +158,7 @@
               </button>
             </div>
           </div>
+
           <div
             id="resultBody"
             class="text-sm space-y-1 text-gray-700 dark:text-gray-200"
@@ -198,6 +191,7 @@
             </p>
           </div>
         </div>
+
         <form id="setupForm" class="mt-4 grid grid-cols-1 gap-4">
           <div>
             <label
@@ -213,6 +207,7 @@
               class="w-full px-4 py-2 rounded-md border bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300"
             />
           </div>
+
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label
@@ -220,14 +215,16 @@
                 class="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-100"
                 >Year</label
               >
+
               <input
                 id="yearInput"
                 type="number"
-                min="1970"
+                min="2000"
                 required
                 class="w-full px-4 py-2 rounded-md border bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300"
               />
             </div>
+
             <div>
               <label
                 id="lblMonth"
@@ -241,6 +238,7 @@
               ></select>
             </div>
           </div>
+
           <div class="flex gap-3">
             <button
               id="cancelSetupBtn"
@@ -297,6 +295,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <script>
       function formatHours(h) {
         const n = Number(h);
@@ -307,7 +306,6 @@
       const LOCALES = {
         en: {
           appTitle: "Work Hours Tracker",
-          appSubtitle: "A modern monthly working-hours calculator",
           modalTitle: "Welcome",
           modalSubtitle:
             "Tell me who you are and which month you want to calculate.",
@@ -362,14 +360,16 @@
           resetSuccess: "Data reset",
           resetFailed: "Could not reset data",
           exportBtnTitle: "Export the last summary to PDF",
-          exportLabel: "Export PDF",
           edit: "Edit",
           reset: "Reset",
           noWorkedSessions: "No worked sessions found for this month.",
+          invalidYear: "Year must be >= 2000 and not beyond the current year",
+          invalidMonth: "Month cannot be in the future for the selected year",
+          noSessionsToCalculate:
+            "Please enter at least one valid work session before calculating",
         },
         it: {
           appTitle: "Calcolatore Ore di Lavoro",
-          appSubtitle: "Un moderno calcolatore mensile delle ore lavorate",
           modalTitle: "Benvenuto",
           modalSubtitle:
             "Dimmi chi sei e per quale mese vuoi calcolare le ore.",
@@ -423,17 +423,22 @@
           resetSuccess: "Dati reimpostati",
           resetFailed: "Impossibile reimpostare i dati",
           exportBtnTitle: "Esporta l'ultimo riepilogo in PDF",
-          exportLabel: "Esporta PDF",
           edit: "Modifica",
           reset: "Reset",
           noWorkedSessions:
             "Nessuna sessione di lavoro trovata per questo mese.",
+          invalidYear: "L'anno deve essere >= 2000 e non oltre l'anno corrente",
+          invalidMonth:
+            "Il mese non può essere nel futuro per l'anno selezionato",
+          noSessionsToCalculate:
+            "Inserisci almeno una sessione valida prima di calcolare",
         },
       };
 
       const STORAGE_KEY = "work_hours_state_v1";
       const THEME_KEY = "wh_theme_v1";
       const LANG_KEY = "wh_lang_v1";
+
       let lang = localStorage.getItem(LANG_KEY) || "en";
       let theme = localStorage.getItem(THEME_KEY) || "light";
       let state = { user: "", year: null, month: null, days: [] };
@@ -464,7 +469,6 @@
         rangeText: document.getElementById("rangeText"),
         greeting: document.getElementById("greeting"),
         appTitle: document.getElementById("appTitle"),
-        appSubtitle: document.getElementById("appSubtitle"),
         modalTitle: document.getElementById("modalTitle"),
         modalSubtitle: document.getElementById("modalSubtitle"),
         lblFullName: document.getElementById("lblFullName"),
@@ -494,19 +498,24 @@
         applyTheme(theme);
         const savedLang = localStorage.getItem(LANG_KEY);
         if (savedLang) lang = savedLang;
-        loadState();
-
         applyLocale();
 
+        loadState();
+
+        if (state.year != null) el.yearInput.value = state.year;
+        else el.yearInput.value = new Date().getFullYear();
+
+        if (state.user) el.fullName.value = state.user;
+
         if (state.year != null && state.month != null) {
-          const expectedCount = new Date(
+          const expected = new Date(
             state.year,
             Number(state.month) + 1,
             0
           ).getDate();
-          const anyOutOfRange =
+          const mismatch =
             !state.days ||
-            state.days.length !== expectedCount ||
+            state.days.length !== expected ||
             state.days.some((d) => {
               const dt = parseISOToLocalDate(d.iso);
               return (
@@ -514,23 +523,21 @@
                 dt.getMonth() !== Number(state.month)
               );
             });
-          if (anyOutOfRange) {
+          if (mismatch) {
             buildDaysState(state.year, state.month);
             saveState();
           }
 
-          el.yearInput.value = state.year;
-          el.fullName.value = state.user || "";
-          el.monthSelect.value = String(state.month);
           el.setupModal.style.display = "none";
           renderAfterSetup();
         } else {
           el.setupModal.style.display = "flex";
           el.cancelSetupBtn.style.display = "none";
-
           el.yearInput.value = new Date().getFullYear();
           el.monthSelect.value = String(new Date().getMonth());
         }
+
+        updateMonthOptions();
 
         attachListeners();
       })();
@@ -540,51 +547,40 @@
         document.documentElement.lang = lang;
         el.langToggle.textContent = lang.toUpperCase();
         el.appTitle.textContent = L.appTitle;
-        el.appSubtitle.textContent = L.appSubtitle;
         el.modalTitle.textContent = L.modalTitle;
         el.modalSubtitle.textContent = L.modalSubtitle;
         el.lblFullName.textContent = L.lblFullName;
         el.lblYear.textContent = L.lblYear;
         el.lblMonth.textContent = L.lblMonth;
-        el.startBtn.textContent = L.startBtn;
+        el.startBtn && (el.startBtn.textContent = L.startBtn);
         el.calculateBtn.textContent = L.calculate;
-
-        const prevMonthVal = el.monthSelect ? el.monthSelect.value : "";
         el.monthSelect.innerHTML = L.months
           .map((m, i) => `<option value="${i}">${m}</option>`)
           .join("");
-        if (prevMonthVal !== "") el.monthSelect.value = prevMonthVal;
-        else if (state.month != null)
-          el.monthSelect.value = String(state.month);
 
+        if (state.month != null) el.monthSelect.value = String(state.month);
         el.editBtn.textContent = L.edit;
         el.resetBtn.textContent = L.reset;
         el.cancelSetupBtn.textContent = L.cancel;
-        el.cancelResetBtn.textContent = L.cancel;
-        el.confirmResetBtn.textContent = L.confirmReset;
-        el.resetTitle.textContent = L.resetTitle;
-        el.resetDesc.textContent = L.resetDesc;
+        el.cancelResetBtn && (el.cancelResetBtn.textContent = L.cancel);
+        el.confirmResetBtn && (el.confirmResetBtn.textContent = L.confirmReset);
+        el.resetTitle && (el.resetTitle.textContent = L.resetTitle);
+        el.resetDesc && (el.resetDesc.textContent = L.resetDesc);
         el.exportPdfBtn.title = L.exportBtnTitle;
-        el.exportPdfBtn.textContent = L.exportLabel || "Export";
+        el.exportPdfBtn.textContent =
+          L.exportBtnTitle && L.exportBtnTitle.includes("PDF")
+            ? "Export PDF"
+            : "Export";
 
-        if (state.user) {
+        if (state.user)
           el.greetText.textContent = `${L.greeting || "Hello"}, ${state.user}`;
-        } else {
-          el.greetText.textContent = L.greeting || "Hello";
-        }
-        if (state.month != null && state.year) {
+        else el.greetText.textContent = L.greeting || "Hello";
+        if (state.month != null && state.year)
           el.rangeText.textContent = `${L.months[state.month]} ${state.year}`;
-        } else {
-          el.rangeText.textContent = "";
-        }
+        else el.rangeText.textContent = "";
 
-        if (state.days && state.days.length > 0) {
-          renderDays();
-        }
-
-        if (!el.resultCard.classList.contains("hidden")) {
-          calculateAndShow();
-        }
+        if (state.days && state.days.length > 0) renderDays();
+        if (!el.resultCard.classList.contains("hidden")) calculateAndShow();
       }
 
       function applyTheme(t) {
@@ -625,6 +621,7 @@
           localStorage.setItem(LANG_KEY, lang);
           applyLocale();
         });
+
         el.themeToggle.addEventListener("click", () => {
           theme = document.documentElement.classList.contains("dark")
             ? "light"
@@ -632,27 +629,47 @@
           applyTheme(theme);
         });
 
+        el.yearInput.addEventListener("input", () => {
+          updateMonthOptions();
+        });
+
         el.setupForm.addEventListener("submit", (e) => {
           e.preventDefault();
+          const L = LOCALES[lang];
+          const now = new Date();
+          const currentYear = now.getFullYear();
+          const currentMonth = now.getMonth();
+
           state.user = el.fullName.value.trim() || "User";
-          state.year = parseInt(el.yearInput.value, 10);
-          state.month = parseInt(el.monthSelect.value, 10);
-          if (isNaN(state.year) || isNaN(state.month)) {
+          const parsedYear = parseInt(el.yearInput.value, 10);
+          const parsedMonth = parseInt(el.monthSelect.value, 10);
+          if (isNaN(parsedYear) || isNaN(parsedMonth)) {
             notyf.error(
-              LOCALES[lang].pleaseProvideYearMonth ||
+              L.pleaseProvideYearMonth ||
                 "Please provide a valid year and month"
             );
             return;
           }
-          // rebuild days for selected month (migration preserves sessions for matching iso dates)
+          if (parsedYear < 2000 || parsedYear > currentYear) {
+            notyf.error(L.invalidYear);
+            return;
+          }
+          if (parsedYear === currentYear && parsedMonth > currentMonth) {
+            notyf.error(L.invalidMonth);
+            return;
+          }
+
+          state.year = parsedYear;
+          state.month = parsedMonth;
+
           buildDaysState(Number(state.year), Number(state.month));
           saveState();
+
           el.setupModal.style.display = "none";
           renderAfterSetup();
-          notyf.success(LOCALES[lang].setupComplete || "Setup complete");
+          notyf.success(L.setupComplete || "Setup complete");
         });
 
-        // cancel on setup: only visible on edit opens
         el.cancelSetupBtn.addEventListener("click", () => {
           el.setupModal.style.display = "none";
         });
@@ -664,9 +681,10 @@
             state.month != null
               ? String(state.month)
               : String(new Date().getMonth());
-          // ensure cancel is visible when opening from Edit
+
           el.cancelSetupBtn.style.display = "";
           el.setupModal.style.display = "flex";
+          updateMonthOptions();
         });
 
         el.resetBtn.addEventListener("click", () => {
@@ -674,22 +692,24 @@
           el.resetConfirmModal.classList.add("flex");
         });
 
-        el.cancelResetBtn.addEventListener("click", () => {
-          el.resetConfirmModal.classList.add("hidden");
-          el.resetConfirmModal.classList.remove("flex");
-        });
+        el.cancelResetBtn &&
+          el.cancelResetBtn.addEventListener("click", () => {
+            el.resetConfirmModal.classList.add("hidden");
+            el.resetConfirmModal.classList.remove("flex");
+          });
 
-        el.confirmResetBtn.addEventListener("click", () => {
-          try {
-            localStorage.removeItem(STORAGE_KEY);
-            state = { user: "", year: null, month: null, days: [] };
-            notyf.success(LOCALES[lang].resetSuccess || "Data reset");
-            setTimeout(() => location.reload(), 350);
-          } catch (err) {
-            console.error(err);
-            notyf.error(LOCALES[lang].resetFailed || "Could not reset data");
-          }
-        });
+        el.confirmResetBtn &&
+          el.confirmResetBtn.addEventListener("click", () => {
+            try {
+              localStorage.removeItem(STORAGE_KEY);
+              state = { user: "", year: null, month: null, days: [] };
+              notyf.success(LOCALES[lang].resetSuccess || "Data reset");
+              setTimeout(() => location.reload(), 350);
+            } catch (err) {
+              console.error(err);
+              notyf.error(LOCALES[lang].resetFailed || "Could not reset data");
+            }
+          });
 
         el.calculateBtn.addEventListener("click", () => {
           calculateAndShow();
@@ -700,11 +720,10 @@
         });
       }
 
-      // deterministic days builder using daysInMonth and migration for existing sessions
       function buildDaysState(year, month) {
         const days = [];
         const yr = Number(year);
-        const m = Number(month); // 0-based
+        const m = Number(month);
         const daysInMonth = new Date(yr, m + 1, 0).getDate();
         const oldMap = {};
         if (Array.isArray(state.days)) {
@@ -756,9 +775,11 @@
             lang === "en" ? "en-US" : "it-IT",
             { day: "numeric", month: "short", year: "numeric" }
           );
+
           const card = document.createElement("article");
           card.className =
             "p-4 rounded-xl bg-white dark:bg-gray-800 shadow card-overflow-hidden";
+
           const header = document.createElement("div");
           header.className = "flex items-start justify-between mb-3 gap-2";
           header.innerHTML = `<div><div class='text-sm text-gray-500 dark:text-gray-300'>${weekday}</div><div class='font-semibold text-gray-900 dark:text-gray-100'>${display}</div></div><div class='text-xs text-gray-500 dark:text-gray-300'>${day.iso}</div>`;
@@ -766,6 +787,7 @@
 
           const sessionsDiv = document.createElement("div");
           sessionsDiv.className = "sessions space-y-2 mb-3 min-w-zero";
+
           if (Array.isArray(day.sessions) && day.sessions.length > 0) {
             day.sessions.forEach((s, sidx) => {
               sessionsDiv.appendChild(
@@ -795,6 +817,7 @@
             saveState();
             renderDays();
           });
+
           const toggleBtn = document.createElement("button");
           toggleBtn.type = "button";
           toggleBtn.className = "px-3 py-1 rounded bg-gray-100 text-sm";
@@ -804,9 +827,11 @@
             saveState();
             renderDays();
           });
+
           actionRow.appendChild(addBtn);
           actionRow.appendChild(toggleBtn);
           card.appendChild(actionRow);
+
           el.daysSection.appendChild(card);
         });
       }
@@ -838,9 +863,11 @@
           hourInput.setAttribute("maxlength", "2");
           hourInput.className =
             "time-input px-2 py-1 rounded-md border bg-gray-50 dark:bg-gray-700 text-center text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300 text-sm w-12 sm:w-16";
+
           const sep = document.createElement("span");
           sep.className = "text-sm text-gray-700 dark:text-gray-300";
           sep.textContent = ":";
+
           const minInput = document.createElement("input");
           minInput.type = "number";
           minInput.min = 0;
@@ -851,6 +878,7 @@
           minInput.setAttribute("maxlength", "2");
           minInput.className =
             "time-input px-2 py-1 rounded-md border bg-gray-50 dark:bg-gray-700 text-center text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300 text-sm w-12 sm:w-16";
+
           const update = () => {
             const hhRaw = hourInput.value;
             const mmRaw = minInput.value;
@@ -870,6 +898,7 @@
               onChangeHandler("");
             }
           };
+
           hourInput.addEventListener("input", () => {
             hourInput.value = hourInput.value
               .toString()
@@ -882,6 +911,7 @@
             }
             update();
           });
+
           minInput.addEventListener("input", () => {
             minInput.value = minInput.value
               .toString()
@@ -894,6 +924,7 @@
             }
             update();
           });
+
           group.appendChild(hourInput);
           group.appendChild(sep);
           group.appendChild(minInput);
@@ -980,7 +1011,17 @@
 
       function calculateAndShow() {
         const L = LOCALES[lang];
-        const { totalHours, daySummaries } = computeSummary();
+        const { totalHours, daySummaries, monthlyMinutes } = computeSummary();
+
+        if (!monthlyMinutes || monthlyMinutes === 0) {
+          notyf.error(
+            L.noSessionsToCalculate ||
+              L.noWorkedSessions ||
+              "Please enter at least one valid session before calculating"
+          );
+          return;
+        }
+
         el.resultTitle.textContent = L.resultTitle(
           state.user || "User",
           LOCALES[lang].months[state.month] || "",
@@ -991,6 +1032,7 @@
         pTotal.className = "font-medium";
         pTotal.textContent = L.totalText(totalHours);
         el.resultBody.appendChild(pTotal);
+
         if (daySummaries.length > 0) {
           const ul = document.createElement("ul");
           ul.className = "list-disc pl-5 mt-2 space-y-1";
@@ -1034,6 +1076,7 @@
           notyf.error(L.pdfLibraryMissing || "PDF library not available");
           return;
         }
+
         const doc = new JsPDFClass({
           unit: "pt",
           format: "a4",
@@ -1071,6 +1114,7 @@
         doc.text(totalLines, margin, y);
         y += totalLines.length * 16;
         y += 6;
+
         if (daySummaries.length > 0) {
           daySummaries.forEach((d) => {
             const entry = `• ${LOCALES[lang].dayText(d.dateStr, d.hours)}`;
@@ -1098,6 +1142,7 @@
           doc.text(noneLines, margin, y);
           y += noneLines.length * 14;
         }
+
         const footer = "Exported from Work Hours Tracker";
         doc.setFontSize(10);
         doc.setTextColor(120);
@@ -1117,6 +1162,38 @@
           notyf.error(L.failedExportingPdf || "Failed exporting PDF");
         }
       }
+
+      function updateMonthOptions() {
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth();
+        const selectedYear = parseInt(el.yearInput.value, 10);
+        if (!el.monthSelect) return;
+        Array.from(el.monthSelect.options).forEach((opt) => {
+          const val = parseInt(opt.value, 10);
+          if (selectedYear === currentYear && val > currentMonth) {
+            opt.disabled = true;
+            opt.classList.add("opacity-50");
+          } else {
+            opt.disabled = false;
+            opt.classList.remove("opacity-50");
+          }
+        });
+        const curVal = parseInt(el.monthSelect.value, 10);
+        if (selectedYear === currentYear && curVal > currentMonth) {
+          el.monthSelect.value = String(currentMonth);
+        }
+      }
+
+      function render() {
+        applyLocale();
+        updateMonthOptions();
+      }
+
+      function renderDaysPublic() {
+        renderDays();
+      }
+      window.__WH = { state, render, renderDays: renderDaysPublic };
     </script>
   </body>
 </html>
