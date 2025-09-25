@@ -68,9 +68,9 @@
   </head>
 
   <body
-    class="min-h-screen bg-gradient-to-br from-slate-50 to-white dark:from-gray-900 dark:to-gray-800 transition-colors"
+    class="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-white dark:from-gray-900 dark:to-gray-800 transition-colors"
   >
-    <div class="max-w-6xl mx-auto p-6">
+    <div class="max-w-6xl mx-auto p-6 flex-grow">
       <header class="flex items-center justify-between gap-4 mb-6">
         <div>
           <h1
@@ -1194,6 +1194,21 @@
         renderDays();
       }
       window.__WH = { state, render, renderDays: renderDaysPublic };
+    </script>
+    <footer class="bg-gray-100 dark:bg-gray-900 text-center py-6">
+      <p class="text-sm text-gray-600 dark:text-gray-400">
+        © <span id="currentYear"></span> All rights reserved
+      </p>
+      <p class="mt-1 text-xs text-gray-500 dark:text-gray-500">
+        Developed and designed by
+        <span class="font-semibold">Maiwand Zazai</span>
+      </p>
+    </footer>
+
+    <script>
+      // Set dynamic year
+      document.getElementById("currentYear").textContent =
+        new Date().getFullYear();
     </script>
   </body>
 </html>
