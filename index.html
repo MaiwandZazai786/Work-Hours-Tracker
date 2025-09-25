@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Work Hours Tracker</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            fontFamily: { sans: ["Inter", "ui-sans-serif", "system-ui"] },
+          },
+        },
+      };
+    </script>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css"
+    />
+
+    <style>
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+      }
+
+      .glass {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(6px);
+      }
+      .dark .glass {
+        background: rgba(17, 24, 39, 0.55);
+      }
+
+      input[type="number"]::-webkit-outer-spin-button,
+      input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      input[type="number"] {
+        -moz-appearance: textfield;
+      }
+
+      .min-w-zero {
+        min-width: 0;
+      }
+
+      .time-input {
+        box-sizing: border-box;
+      }
+
+      .card-overflow-hidden {
+        overflow: hidden;
+      }
+    </style>
+  </head>
+
+  <body
+    class="min-h-screen bg-gradient-to-br from-slate-50 to-white dark:from-gray-900 dark:to-gray-800 transition-colors"
+  >
+    <div class="max-w-6xl mx-auto p-6">
+      <header class="flex items-center justify-between gap-4 mb-6">
+        <div class="flex items-center gap-4">
+          <div
+            class="w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br from-indigo-600 to-pink-500 text-white text-lg font-bold shadow"
+          >
+            WH
+          </div>
+          <div>
+            <h1
+              id="appTitle"
+              class="text-2xl font-extrabold text-gray-900 dark:text-white"
+            >
+              Work Hours Tracker
+            </h1>
+            <p
+              id="appSubtitle"
+              class="text-sm text-gray-600 dark:text-gray-300"
+            >
+              A modern monthly working-hours calculator
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button
+            id="langToggle"
+            class="px-3 py-2 rounded-md bg-white border shadow-sm text-sm"
+          >
+            EN
+          </button>
+          <button
+            id="themeToggle"
+            class="px-3 py-2 rounded-md bg-white border shadow-sm text-sm"
+          >
+            🌗
+          </button>
+          <button
+            id="editBtn"
+            class="px-3 py-2 rounded-md bg-indigo-600 text-white text-sm hidden"
+          >
+            Edit
+          </button>
+          <button
+            id="resetBtn"
+            class="px-3 py-2 rounded-md bg-red-100 text-red-700 text-sm hidden"
+          >
+            Reset
+          </button>
+        </div>
+      </header>
+
+      <div id="greeting" class="hidden mb-6 p-4 rounded-lg glass shadow">
+        <div class="flex items-center justify-between">
+          <div>
+            <p
+              id="greetText"
+              class="text-lg font-semibold text-gray-900 dark:text-gray-100"
+            >
+              Hello
+            </p>
+            <p id="rangeText" class="text-sm text-gray-600 dark:text-gray-300">
+              July 2025
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <main>
+        <section
+          id="daysSection"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+        ></section>
+
+        <div class="mt-6">
+          <button
+            id="calculateBtn"
+            class="hidden w-full py-3 rounded-lg bg-indigo-600 text-white font-semibold"
+          >
+            Calculate total hours
+          </button>
+        </div>
+
+        <div id="resultCard" class="hidden mt-6 p-4 rounded-lg glass shadow">
+          <h2
+            id="resultTitle"
+            class="text-xl font-bold mb-2 text-gray-900 dark:text-gray-100"
+          >
+            Summary
+          </h2>
+          <div
+            id="resultBody"
+            class="text-sm space-y-1 text-gray-700 dark:text-gray-200"
+          ></div>
+        </div>
+      </main>
+    </div>
+
+    <div
+      id="setupModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+    >
+      <div
+        class="w-full max-w-lg p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-xl"
+      >
+        <div class="flex items-start justify-between mb-2">
+          <div>
+            <h3
+              id="modalTitle"
+              class="text-2xl font-bold text-gray-900 dark:text-gray-100"
+            >
+              Welcome
+            </h3>
+            <p
+              id="modalSubtitle"
+              class="text-sm text-gray-600 dark:text-gray-300"
+            >
+              Tell me who you are and which month you want to calculate.
+            </p>
+          </div>
+        </div>
+
+        <form id="setupForm" class="mt-4 grid grid-cols-1 gap-4">
+          <div>
+            <label
+              id="lblFullName"
+              class="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-100"
+            >
+              Full name
+            </label>
+            <input
+              id="fullName"
+              type="text"
+              placeholder="John Doe"
+              required
+              class="w-full px-4 py-2 rounded-md border bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300"
+            />
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label
+                id="lblYear"
+                class="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-100"
+                >Year</label
+              >
+              <input
+                id="yearInput"
+                type="number"
+                min="1970"
+                required
+                class="w-full px-4 py-2 rounded-md border bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300"
+              />
+            </div>
+            <div>
+              <label
+                id="lblMonth"
+                class="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-100"
+                >Month</label
+              >
+              <select
+                id="monthSelect"
+                required
+                class="w-full px-4 py-2 rounded-md border bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              ></select>
+            </div>
+          </div>
+
+          <div class="flex gap-3">
+            <button
+              id="startBtn"
+              type="submit"
+              class="flex-1 py-3 bg-indigo-600 text-white rounded-lg font-semibold"
+            >
+              Start
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div
+      id="resetConfirmModal"
+      class="fixed inset-0 z-60 hidden items-center justify-center bg-black/40"
+    >
+      <div
+        class="w-full max-w-md p-6 rounded-xl bg-white dark:bg-gray-800 shadow-xl"
+      >
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          Reset all data?
+        </h3>
+        <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
+          This will remove all stored sessions and settings for the current
+          month. This action cannot be undone.
+        </p>
+        <div class="mt-6 flex justify-end gap-3">
+          <button
+            id="cancelResetBtn"
+            class="px-4 py-2 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+          >
+            Cancel
+          </button>
+          <button
+            id="confirmResetBtn"
+            class="px-4 py-2 rounded-md bg-red-600 text-white"
+          >
+            Reset
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+
+    <script>
+      const LOCALES = {
+        en: {
+          appTitle: "Work Hours Tracker",
+          appSubtitle: "A modern monthly working-hours calculator",
+          modalTitle: "Welcome",
+          modalSubtitle:
+            "Tell me who you are and which month you want to calculate.",
+          lblFullName: "Full name",
+          lblYear: "Year",
+          lblMonth: "Month",
+          startBtn: "Start",
+          addSession: "+ Session",
+          removeSession: "Remove",
+          notWorked: "Not worked",
+          markWorked: "Mark worked",
+          calculate: "Calculate total hours",
+          resultTitle: (name) => `Dear ${name}, here's your summary`,
+          totalText: (total) => `Your total work hours this month: ${total} h`,
+          dayText: (dateStr, hours) => `${dateStr} — ${hours} h`,
+          months: [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+          ],
+        },
+        it: {
+          appTitle: "Calcolatore Ore di Lavoro",
+          appSubtitle: "Un moderno calcolatore mensile delle ore lavorate",
+          modalTitle: "Benvenuto",
+          modalSubtitle:
+            "Dimmi chi sei e per quale mese vuoi calcolare le ore.",
+          lblFullName: "Nome completo",
+          lblYear: "Anno",
+          lblMonth: "Mese",
+          startBtn: "Inizia",
+          addSession: "+ Sessione",
+          removeSession: "Rimuovi",
+          notWorked: "Non lavorato",
+          markWorked: "Segna lavorato",
+          calculate: "Calcola ore totali",
+          resultTitle: (name) => `Caro ${name}, ecco il tuo riepilogo`,
+          totalText: (total) => `Ore totali lavorate questo mese: ${total} h`,
+          dayText: (dateStr, hours) => `${dateStr} — ${hours} h`,
+          months: [
+            "Gennaio",
+            "Febbraio",
+            "Marzo",
+            "Aprile",
+            "Maggio",
+            "Giugno",
+            "Luglio",
+            "Agosto",
+            "Settembre",
+            "Ottobre",
+            "Novembre",
+            "Dicembre",
+          ],
+        },
+      };
+
+      const STORAGE_KEY = "work_hours_state_v1";
+      const THEME_KEY = "wh_theme_v1";
+      const LANG_KEY = "wh_lang_v1";
+
+      let lang = localStorage.getItem(LANG_KEY) || "en";
+      let theme = localStorage.getItem(THEME_KEY) || "light";
+      let state = {
+        user: "",
+        year: null,
+        month: null,
+        days: [],
+      };
+
+      const notyf = new Notyf({
+        duration: 2200,
+        position: { x: "right", y: "top" },
+        ripple: true,
+      });
+
+      const el = {
+        langToggle: document.getElementById("langToggle"),
+        themeToggle: document.getElementById("themeToggle"),
+        setupModal: document.getElementById("setupModal"),
+        setupForm: document.getElementById("setupForm"),
+        fullName: document.getElementById("fullName"),
+        yearInput: document.getElementById("yearInput"),
+        monthSelect: document.getElementById("monthSelect"),
+        startBtn: document.getElementById("startBtn"),
+        daysSection: document.getElementById("daysSection"),
+        calculateBtn: document.getElementById("calculateBtn"),
+        resultCard: document.getElementById("resultCard"),
+        resultTitle: document.getElementById("resultTitle"),
+        resultBody: document.getElementById("resultBody"),
+        greetText: document.getElementById("greetText"),
+        rangeText: document.getElementById("rangeText"),
+        greeting: document.getElementById("greeting"),
+        appTitle: document.getElementById("appTitle"),
+        appSubtitle: document.getElementById("appSubtitle"),
+        modalTitle: document.getElementById("modalTitle"),
+        modalSubtitle: document.getElementById("modalSubtitle"),
+        lblFullName: document.getElementById("lblFullName"),
+        lblYear: document.getElementById("lblYear"),
+        lblMonth: document.getElementById("lblMonth"),
+        editBtn: document.getElementById("editBtn"),
+        resetBtn: document.getElementById("resetBtn"),
+        resetConfirmModal: document.getElementById("resetConfirmModal"),
+        cancelResetBtn: document.getElementById("cancelResetBtn"),
+        confirmResetBtn: document.getElementById("confirmResetBtn"),
+      };
+
+      (function init() {
+        applyTheme(theme);
+        const savedLang = localStorage.getItem(LANG_KEY);
+        if (savedLang) lang = savedLang;
+        applyLocale();
+        loadState();
+
+        el.yearInput.value = state.year || new Date().getFullYear();
+        el.fullName.value = state.user || "";
+        if (state.month !== null) el.monthSelect.value = state.month;
+
+        if (state.days && state.days.length > 0) {
+          el.setupModal.style.display = "none";
+          renderAfterSetup();
+        } else {
+          el.setupModal.style.display = "flex";
+        }
+
+        attachListeners();
+      })();
+
+      function applyLocale() {
+        const L = LOCALES[lang];
+        document.documentElement.lang = lang;
+        el.langToggle.textContent = lang.toUpperCase();
+        el.appTitle.textContent = L.appTitle;
+        el.appSubtitle.textContent = L.appSubtitle;
+        el.modalTitle.textContent = L.modalTitle;
+        el.modalSubtitle.textContent = L.modalSubtitle;
+        el.lblFullName.textContent = L.lblFullName;
+        el.lblYear.textContent = L.lblYear;
+        el.lblMonth.textContent = L.lblMonth;
+        el.startBtn.textContent = L.startBtn;
+        el.calculateBtn.textContent = L.calculate;
+        el.monthSelect.innerHTML = L.months
+          .map((m, i) => `<option value="${i}">${m}</option>`)
+          .join("");
+        if (state.days && state.days.length > 0) renderDays();
+      }
+
+      function applyTheme(t) {
+        if (t === "dark") document.documentElement.classList.add("dark");
+        else document.documentElement.classList.remove("dark");
+        localStorage.setItem(THEME_KEY, t);
+      }
+
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed) state = parsed;
+          }
+          const savedTheme = localStorage.getItem(THEME_KEY);
+          if (savedTheme) {
+            theme = savedTheme;
+            applyTheme(theme);
+          }
+        } catch (e) {
+          console.warn("Could not load state", e);
+        }
+      }
+
+      function saveState() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (e) {
+          console.warn("Could not save state", e);
+          notyf.error("Failed saving data");
+        }
+      }
+
+      function attachListeners() {
+        el.langToggle.addEventListener("click", () => {
+          lang = lang === "en" ? "it" : "en";
+          localStorage.setItem(LANG_KEY, lang);
+          applyLocale();
+        });
+
+        el.themeToggle.addEventListener("click", () => {
+          theme = document.documentElement.classList.contains("dark")
+            ? "light"
+            : "dark";
+          applyTheme(theme);
+        });
+
+        el.setupForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          state.user = el.fullName.value.trim() || "User";
+          state.year = parseInt(el.yearInput.value, 10);
+          state.month = parseInt(el.monthSelect.value, 10);
+          if (isNaN(state.year) || isNaN(state.month)) {
+            notyf.error("Please provide a valid year and month");
+            return;
+          }
+          buildDaysState(state.year, state.month);
+          saveState();
+          el.setupModal.style.display = "none";
+          renderAfterSetup();
+          notyf.success("Setup complete");
+        });
+
+        el.editBtn.addEventListener("click", () => {
+          el.fullName.value = state.user;
+          el.yearInput.value = state.year;
+          el.monthSelect.value = state.month;
+          el.setupModal.style.display = "flex";
+        });
+
+        el.resetBtn.addEventListener("click", () => {
+          el.resetConfirmModal.classList.remove("hidden");
+          el.resetConfirmModal.classList.add("flex");
+        });
+
+        el.cancelResetBtn.addEventListener("click", () => {
+          el.resetConfirmModal.classList.add("hidden");
+          el.resetConfirmModal.classList.remove("flex");
+        });
+
+        el.confirmResetBtn.addEventListener("click", () => {
+          try {
+            localStorage.removeItem(STORAGE_KEY);
+            state = { user: "", year: null, month: null, days: [] };
+            notyf.success("Data reset");
+            setTimeout(() => location.reload(), 450);
+          } catch (err) {
+            console.error(err);
+            notyf.error("Could not reset data");
+          }
+        });
+
+        el.calculateBtn.addEventListener("click", () => {
+          calculateAndShow();
+        });
+      }
+
+      function buildDaysState(year, month) {
+        const days = [];
+        const d = new Date(year, month, 1);
+        while (d.getMonth() === month) {
+          const iso = d.toISOString().slice(0, 10);
+          days.push({ iso, sessions: [], notWorked: false });
+          d.setDate(d.getDate() + 1);
+        }
+        state.days = days;
+      }
+
+      function renderAfterSetup() {
+        el.greetText.textContent = `${lang === "en" ? "Hello" : "Ciao"}, ${
+          state.user
+        }`;
+        el.rangeText.textContent = `${LOCALES[lang].months[state.month]} ${
+          state.year
+        }`;
+        el.greeting.classList.remove("hidden");
+        el.calculateBtn.classList.remove("hidden");
+        el.editBtn.classList.remove("hidden");
+        el.resetBtn.classList.remove("hidden");
+        renderDays();
+      }
+
+      function renderDays() {
+        el.daysSection.innerHTML = "";
+        const L = LOCALES[lang];
+        state.days.forEach((day, dayIndex) => {
+          const dateObj = new Date(day.iso + "T00:00:00");
+          const weekday = dateObj.toLocaleDateString(
+            lang === "en" ? "en-US" : "it-IT",
+            { weekday: "long" }
+          );
+          const display = dateObj.toLocaleDateString(
+            lang === "en" ? "en-US" : "it-IT",
+            { day: "numeric", month: "short", year: "numeric" }
+          );
+
+          const card = document.createElement("article");
+          card.className =
+            "p-4 rounded-xl bg-white dark:bg-gray-800 shadow card-overflow-hidden";
+
+          const header = document.createElement("div");
+          header.className = "flex items-start justify-between mb-3 gap-2";
+          header.innerHTML = `
+            <div>
+              <div class='text-sm text-gray-500 dark:text-gray-300'>${weekday}</div>
+              <div class='font-semibold text-gray-900 dark:text-gray-100'>${display}</div>
+            </div>
+            <div class='text-xs text-gray-500 dark:text-gray-300'>${day.iso}</div>
+          `;
+          card.appendChild(header);
+
+          const sessionsDiv = document.createElement("div");
+          sessionsDiv.className = "sessions space-y-2 mb-3 min-w-zero";
+          day.sessions.forEach((s, sidx) => {
+            const row = createSessionRow(dayIndex, sidx, s.start, s.end);
+            sessionsDiv.appendChild(row);
+          });
+
+          if (day.sessions.length === 0 && !day.notWorked) {
+            const hint = document.createElement("div");
+            hint.className = "text-xs text-gray-400 dark:text-gray-300";
+            hint.textContent =
+              lang === "en" ? "No sessions yet" : "Nessuna sessione";
+            sessionsDiv.appendChild(hint);
+          }
+
+          if (day.notWorked) sessionsDiv.style.display = "none";
+
+          card.appendChild(sessionsDiv);
+
+          const actionRow = document.createElement("div");
+          actionRow.className = "flex gap-2 items-center";
+
+          const addBtn = document.createElement("button");
+          addBtn.type = "button";
+          addBtn.className =
+            "px-3 py-1 rounded bg-indigo-600 text-white text-sm";
+          addBtn.textContent = L.addSession;
+          addBtn.addEventListener("click", () => {
+            day.sessions.push({ start: "", end: "" });
+            saveState();
+            renderDays();
+          });
+
+          const toggleBtn = document.createElement("button");
+          toggleBtn.type = "button";
+          toggleBtn.className = "px-3 py-1 rounded bg-gray-100 text-sm";
+          toggleBtn.textContent = day.notWorked ? L.markWorked : L.notWorked;
+          toggleBtn.addEventListener("click", () => {
+            day.notWorked = !day.notWorked;
+            saveState();
+            renderDays();
+          });
+
+          actionRow.appendChild(addBtn);
+          actionRow.appendChild(toggleBtn);
+          card.appendChild(actionRow);
+
+          el.daysSection.appendChild(card);
+        });
+      }
+
+      function createSessionRow(
+        dayIndex,
+        sessionIndex,
+        startVal = "",
+        endVal = ""
+      ) {
+        const row = document.createElement("div");
+        row.className = "flex gap-2 items-center min-w-zero";
+
+        function buildTimeGroup(initialVal, onChangeHandler) {
+          const group = document.createElement("div");
+          group.className = "flex items-center gap-1 min-w-zero";
+
+          const parts =
+            initialVal && initialVal.includes(":")
+              ? initialVal.split(":")
+              : ["", ""];
+
+          const hourInput = document.createElement("input");
+          hourInput.type = "number";
+          hourInput.min = 0;
+          hourInput.max = 23;
+          hourInput.placeholder = "HH";
+          hourInput.value = parts[0] || "";
+          hourInput.setAttribute("inputmode", "numeric");
+          hourInput.setAttribute("maxlength", "2");
+          hourInput.className =
+            "time-input px-2 py-1 rounded-md border bg-gray-50 dark:bg-gray-700 text-center text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300 text-sm w-12 sm:w-16";
+
+          const sep = document.createElement("span");
+          sep.className = "text-sm text-gray-700 dark:text-gray-300";
+          sep.textContent = ":";
+
+          const minInput = document.createElement("input");
+          minInput.type = "number";
+          minInput.min = 0;
+          minInput.max = 59;
+          minInput.placeholder = "MM";
+          minInput.value = parts[1] || "";
+          minInput.setAttribute("inputmode", "numeric");
+          minInput.setAttribute("maxlength", "2");
+          minInput.className =
+            "time-input px-2 py-1 rounded-md border bg-gray-50 dark:bg-gray-700 text-center text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300 text-sm w-12 sm:w-16";
+
+          const update = () => {
+            const hhRaw = hourInput.value;
+            const mmRaw = minInput.value;
+            const hhNum = hhRaw === "" ? NaN : Number(hhRaw);
+            const mmNum = mmRaw === "" ? NaN : Number(mmRaw);
+            if (Number.isInteger(hhNum) && Number.isInteger(mmNum)) {
+              const hh = String(Math.max(0, Math.min(23, hhNum))).padStart(
+                2,
+                "0"
+              );
+              const mm = String(Math.max(0, Math.min(59, mmNum))).padStart(
+                2,
+                "0"
+              );
+              onChangeHandler(`${hh}:${mm}`);
+            } else {
+              onChangeHandler("");
+            }
+          };
+
+          hourInput.addEventListener("input", () => {
+            hourInput.value = hourInput.value
+              .toString()
+              .replace(/\D/g, "")
+              .slice(0, 2);
+            if (hourInput.value !== "") {
+              let v = Number(hourInput.value);
+              if (!Number.isFinite(v) || isNaN(v)) v = 0;
+              if (v > 23) hourInput.value = "23";
+            }
+            update();
+          });
+
+          minInput.addEventListener("input", () => {
+            minInput.value = minInput.value
+              .toString()
+              .replace(/\D/g, "")
+              .slice(0, 2);
+            if (minInput.value !== "") {
+              let v = Number(minInput.value);
+              if (!Number.isFinite(v) || isNaN(v)) v = 0;
+              if (v > 59) minInput.value = "59";
+            }
+            update();
+          });
+
+          group.appendChild(hourInput);
+          group.appendChild(sep);
+          group.appendChild(minInput);
+          return group;
+        }
+
+        const startGroup = buildTimeGroup(startVal, (val) => {
+          if (!state.days[dayIndex].sessions[sessionIndex])
+            state.days[dayIndex].sessions[sessionIndex] = {
+              start: "",
+              end: "",
+            };
+          state.days[dayIndex].sessions[sessionIndex].start = val;
+          saveState();
+        });
+
+        const endGroup = buildTimeGroup(endVal, (val) => {
+          if (!state.days[dayIndex].sessions[sessionIndex])
+            state.days[dayIndex].sessions[sessionIndex] = {
+              start: "",
+              end: "",
+            };
+          state.days[dayIndex].sessions[sessionIndex].end = val;
+          saveState();
+        });
+
+        const removeBtn = document.createElement("button");
+        removeBtn.type = "button";
+        removeBtn.className =
+          "px-3 py-2 rounded bg-red-100 text-red-600 text-sm";
+        removeBtn.title = LOCALES[lang].removeSession || "Remove";
+        removeBtn.innerHTML = "✕";
+        removeBtn.addEventListener("click", () => {
+          state.days[dayIndex].sessions.splice(sessionIndex, 1);
+          saveState();
+          renderDays();
+        });
+
+        row.appendChild(startGroup);
+        row.appendChild(endGroup);
+        row.appendChild(removeBtn);
+        return row;
+      }
+
+      function calculateAndShow() {
+        let monthlyMinutes = 0;
+        const daySummaries = [];
+        state.days.forEach((d) => {
+          if (d.notWorked) return;
+          let dayMinutes = 0;
+          d.sessions.forEach((s) => {
+            if (!s.start || !s.end) return;
+            const [sh, sm] = s.start.split(":").map(Number);
+            const [eh, em] = s.end.split(":").map(Number);
+            let startM = sh * 60 + sm;
+            let endM = eh * 60 + em;
+            let diff = endM - startM;
+            if (diff < 0) diff += 24 * 60; // overnight
+            if (diff > 0) dayMinutes += diff;
+          });
+          if (dayMinutes > 0) {
+            monthlyMinutes += dayMinutes;
+            const hours = Math.round((dayMinutes / 60) * 100) / 100;
+            const dateObj = new Date(d.iso + "T00:00:00");
+            const dateStr = dateObj.toLocaleDateString(
+              lang === "en" ? "en-US" : "it-IT",
+              { weekday: "short", day: "numeric", month: "short" }
+            );
+            daySummaries.push({ dateStr, hours });
+          }
+        });
+
+        const totalHours = Math.round((monthlyMinutes / 60) * 100) / 100;
+        const L = LOCALES[lang];
+        el.resultTitle.textContent = L.resultTitle(state.user);
+        el.resultBody.innerHTML = `<p class='font-medium'>${L.totalText(
+          totalHours.toFixed(2)
+        )}</p>`;
+
+        if (daySummaries.length > 0) {
+          const ul = document.createElement("ul");
+          ul.className = "list-disc pl-5 mt-2 space-y-1";
+          daySummaries.forEach((d) => {
+            const li = document.createElement("li");
+            li.textContent = L.dayText(d.dateStr, d.hours);
+            ul.appendChild(li);
+          });
+          el.resultBody.appendChild(ul);
+        } else {
+          const p = document.createElement("p");
+          p.className = "mt-2 text-sm text-gray-600 dark:text-gray-300";
+          p.textContent =
+            lang === "en"
+              ? "No worked sessions found for this month."
+              : "Nessuna sessione di lavoro trovata per questo mese.";
+          el.resultBody.appendChild(p);
+        }
+
+        el.resultCard.classList.remove("hidden");
+        el.resultCard.scrollIntoView({ behavior: "smooth" });
+      }
+    </script>
+  </body>
+</html>
